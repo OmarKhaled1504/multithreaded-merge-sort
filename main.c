@@ -3,7 +3,52 @@
 #include <unistd.h>
 #include <malloc.h>
 
-int i = 0;
+
+struct args {
+    int *arg1;
+    int arg2;
+    int arg3;
+};
+int size = 0;
+
+void merge(int arr[], int l, int m, int r);
+
+void *arguments(void *args);
+
+void *mergeSort(int arr[], int l, int r);
+
+void printArray(int A[]);
+
+int *readArray();
+
+int main() {
+
+    int *array = readArray();
+
+    printf("Given array is \n");
+    printArray(array);
+
+    mergeSort(array, 0, size - 1);
+
+    printf("\nSorted array is \n");
+    printArray(array);
+
+    return 0;
+}
+
+int *readArray() {
+    char fname[100];
+    printf("Enter file name: ");
+    scanf("%s",&fname);
+    FILE *fp = fopen(fname, "r");
+
+    fscanf(fp, "%d\n", &size);
+    int *array = (int *) malloc(size * sizeof(int));
+    for (int i = 0; i < size; ++i) {
+        fscanf(fp, "%d", &array[i]);
+    }
+    return array;
+}
 
 void merge(int arr[], int l, int m, int r) {
     int i, j, k;
@@ -19,7 +64,7 @@ void merge(int arr[], int l, int m, int r) {
     for (j = 0; j < n2; j++)
         R[j] = arr[m + 1 + j];
 
-    // merge the temp arrays back into arr
+    // merge the temp arrays back into array
     i = 0;
     j = 0;
     k = l;
@@ -48,50 +93,42 @@ void merge(int arr[], int l, int m, int r) {
     }
 }
 
-void *mergeSort(int arr[], int l, int r, pthread_t *tharr) {
-    printf("alo2");
+
+void *arguments(void *args) {
+    struct args *arguments = args;
+    mergeSort(arguments->arg1, arguments->arg2, arguments->arg3);
+}
+
+void *mergeSort(int arr[], int l, int r) {
+
     if (l < r) {
-
         int m = (l + r) / 2;
+        struct args args1;
+        args1.arg1 = arr;
+        args1.arg2 = l;
+        args1.arg3 = m;
+        struct args args2;
+        args2.arg1 = arr;
+        args2.arg2 = m + 1;
+        args2.arg3 = r;
 
+        pthread_t th1;
+        pthread_t th2;
         // Sort first and second halves
+        pthread_create(&th1, NULL, &arguments, (void *) &args1);
+        pthread_create(&th2, NULL, &arguments, (void *) &args2);
 
-        pthread_create(tharr+(i++), NULL, mergeSort(arr, l, m, tharr), NULL);
-        pthread_create(tharr+(i++), NULL, mergeSort(arr, m + 1, r, tharr), NULL);
-        for (int j = 0; j < i; j++)
-            pthread_join(tharr[j], NULL);
 
+        pthread_join(th1, NULL);
+        pthread_join(th2, NULL);
         merge(arr, l, m, r);
     }
 }
 
-void *routine() {
 
-    printf("hello\n");
-    sleep(3);
-    printf("bye\n");
-}
-void printArray(int A[], int size)
-{
+void printArray(int A[]) {
     int i;
     for (i = 0; i < size; i++)
         printf("%d ", A[i]);
     printf("\n");
-}
-int main() {
-//    int n;
-//    scanf("%d", &n);
-    int arr[] = { 12, 11, 13, 5, 6, 7 };
-    int arr_size = sizeof(arr) / sizeof(arr[0]);
-    pthread_t *tharr = (pthread_t *) malloc(arr_size * sizeof(pthread_t));
-
-    printf("Given array is \n");
-    printArray(arr, arr_size);
-    printf("alo1");
-    mergeSort(arr, 0, arr_size - 1,tharr);
-
-    printf("\nSorted array is \n");
-    printArray(arr, arr_size);
-
-    return 0;
 }
