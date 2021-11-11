@@ -15,7 +15,7 @@ void merge(int arr[], int l, int m, int r);
 
 void *arguments(void *args);
 
-void *mergeSort(int arr[], int l, int r);
+void mergeSort(int arr[], int l, int r);
 
 void printArray(int A[]);
 
@@ -39,7 +39,7 @@ int main() {
 int *readArray() {
     char fname[100];
     printf("Enter file name: ");
-    scanf("%s",&fname);
+    scanf("%s", &fname);
     FILE *fp = fopen(fname, "r");
 
     fscanf(fp, "%d\n", &size);
@@ -99,7 +99,7 @@ void *arguments(void *args) {
     mergeSort(arguments->arg1, arguments->arg2, arguments->arg3);
 }
 
-void *mergeSort(int arr[], int l, int r) {
+void mergeSort(int arr[], int l, int r) {
 
     if (l < r) {
         int m = (l + r) / 2;
