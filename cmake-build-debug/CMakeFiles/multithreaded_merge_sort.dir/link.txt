@@ -1,1 +1,0 @@
-/usr/bin/cc -g CMakeFiles/multithreaded_merge_sort.dir/main.c.o -o multithreaded_merge_sort 
